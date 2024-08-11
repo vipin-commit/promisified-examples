@@ -33,64 +33,92 @@
     <h1>Promisify Examples</h1>
     <button onclick="Run()">Run</button>
     <div>
-        <h2>1. Trigger Timeout</h2>
-        <label for="seconds">Enter seconds for countdown:</label>
+        <h2>1. Timeout</h2>
+        <p>Here Timeout function promise to await until setTimeout is resolved, which allows us to use <b>delay in asynchronous code.</b></p>
+        <label for="seconds">Timeout function Value:</label>
         <input type="number" id="seconds" placeholder="Enter seconds">
-        
     </div>
-
     <div>
-        <h2>2. Fetch Data</h2>
-        <p><b>sample url </b>: "  https://reqbin.com/echo/get/json  "  ,"  https://jsonplaceholder.typicode.com/todos/1  "</p>
-        <label for="fetchUrl">Enter URL to fetch:</label>
-        <input type="url" id="fetchUrl" placeholder="Enter URL">
+        <h2>Fetch Data</h2>
+        <label for="fetchUrl">Select URL to fetch:</label>
+        <select id="fetchUrl" onchange="toggleCustomUrlInput()">
+            <option value="https://jsonplaceholder.typicode.com/todos/1">https://jsonplaceholder.typicode.com/todos/1</option>
+            <option value="https://reqbin.com/echo/get/json">https://reqbin.com/echo/get/json</option>
+            <option value="custom">Custom URL</option>
+        </select>
+        <input type="url" id="customUrl" placeholder="Enter custom URL" style="display:none;">
     </div>
-
     <div>
         <h2>3. Read File</h2>
     </div>
-
     <h2>Output:</h2>
     <div class="output-box">
         <pre id="output" class="placeholder">Output will be here!</pre>
     </div>
 
     <script>
+        function toggleCustomUrlInput() {
+            const fetchUrl = document.getElementById('fetchUrl').value;
+            const customUrlInput = document.getElementById('customUrl');
+            if (fetchUrl === 'custom') {
+                customUrlInput.style.display = 'block';
+            } else {
+                customUrlInput.style.display = 'none';
+            }
+        }
+
         async function Run() {
             const outputElement = document.getElementById('output');
             outputElement.innerText = '';  // Clear previous output
             
             // Timeout
             const seconds = document.getElementById('seconds').value;
-            outputElement.innerText += `We will wait for ${seconds} seconds.\n\n`;
             if (seconds) {
+                outputElement.innerText += `Waiting for ${seconds} seconds.\n\n`;
                 const responseTimeout = await fetch(`/timeout?ms=${seconds * 1000}`);
                 const result1 = await responseTimeout.text();
                 outputElement.innerText += `${result1}\n\n`;
             } else {
                 outputElement.innerText += 'Please enter the number of seconds for the timeout.\n\n';
             }
-
+            
             // URL Fetching
-            const url = document.getElementById('fetchUrl').value;
+            const fetchUrl = document.getElementById('fetchUrl').value;
+            let url = fetchUrl;
+            if (fetchUrl === 'custom') {
+                url = document.getElementById('customUrl').value;
+                if (!url) {
+                    outputElement.innerText += 'Please enter a valid custom URL.\n\n';
+                    return;
+                }
+            }
+            
             if (url) {
-                const responseUrlFetch = await fetch('/fetch', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ url }),
-                });
-                const result2 = await responseUrlFetch.json();
-                outputElement.innerText += `Fetch Result: ${JSON.stringify(result2, null, 2)}\n\n`;
+                try {
+                    const responseUrlFetch = await fetch('/fetch', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ url }),
+                    });
+                    const result2 = await responseUrlFetch.json();
+                    outputElement.innerText += `Fetch Result: ${JSON.stringify(result2, null, 2)}\n\n`;
+                } catch (error) {
+                    outputElement.innerText += `Error fetching data: ${error.message}\n\n`;
+                }
             } else {
                 outputElement.innerText += 'Please enter a valid URL to fetch data.\n\n';
             }
 
             // Read File
-            const responseFile = await fetch('/readfile');
-            const result3 = await responseFile.text();
-            outputElement.innerText += `Read File Result: ${result3}`;
+            try {
+                const responseFile = await fetch('/readfile');
+                const result3 = await responseFile.text();
+                outputElement.innerText += `Read File Result: ${result3}\n\n`;
+            } catch (error) {
+                outputElement.innerText += `Error reading file: ${error.message}\n\n`;
+            }
 
             // Adjust placeholder styling
             if (outputElement.innerText.trim()) {
