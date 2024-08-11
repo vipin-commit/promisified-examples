@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require('fs/promises');
 
 // Promisified setTimeout
 function timeout(ms) {
@@ -6,16 +6,8 @@ function timeout(ms) {
 }
 
 // Promisified readFile
-function readFile(path, encoding) {
-    return new Promise((resolve, reject) => {
-        fs.readFile(path, encoding, (err, data) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(data);
-            }
-        });
-    });
+async function readFile(path, encoding) {
+    return await fs.readFile(path, encoding);
 }
 
 module.exports = { timeout, readFile };

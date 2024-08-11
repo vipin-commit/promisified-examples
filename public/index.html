@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promisify Examples</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .output-box {
+            border: 2px solid #999;
+            border-radius: 8px;
+            padding: 10px;
+            background-color: #f4f4f4;
+            max-width: 600px; 
+            overflow: auto; 
+        }
+
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+
+        .placeholder {
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <h1>Promisify Examples</h1>
+    <button onclick="Run()">Run</button>
+    <div>
+        <h2>1. Trigger Timeout</h2>
+        <label for="seconds">Enter seconds for countdown:</label>
+        <input type="number" id="seconds" placeholder="Enter seconds">
+        
+    </div>
+
+    <div>
+        <h2>2. Fetch Data</h2>
+        <p><b>sample url </b>: "  https://reqbin.com/echo/get/json  "  ,"  https://jsonplaceholder.typicode.com/todos/1  "</p>
+        <label for="fetchUrl">Enter URL to fetch:</label>
+        <input type="url" id="fetchUrl" placeholder="Enter URL">
+    </div>
+
+    <div>
+        <h2>3. Read File</h2>
+    </div>
+
+    <h2>Output:</h2>
+    <div class="output-box">
+        <pre id="output" class="placeholder">Output will be here!</pre>
+    </div>
+
+    <script>
+        async function Run() {
+            const outputElement = document.getElementById('output');
+            outputElement.innerText = '';  // Clear previous output
+            
+            // Timeout
+            const seconds = document.getElementById('seconds').value;
+            outputElement.innerText += `We will wait for ${seconds} seconds.\n\n`;
+            if (seconds) {
+                const responseTimeout = await fetch(`/timeout?ms=${seconds * 1000}`);
+                const result1 = await responseTimeout.text();
+                outputElement.innerText += `${result1}\n\n`;
+            } else {
+                outputElement.innerText += 'Please enter the number of seconds for the timeout.\n\n';
+            }
+
+            // URL Fetching
+            const url = document.getElementById('fetchUrl').value;
+            if (url) {
+                const responseUrlFetch = await fetch('/fetch', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url }),
+                });
+                const result2 = await responseUrlFetch.json();
+                outputElement.innerText += `Fetch Result: ${JSON.stringify(result2, null, 2)}\n\n`;
+            } else {
+                outputElement.innerText += 'Please enter a valid URL to fetch data.\n\n';
+            }
+
+            // Read File
+            const responseFile = await fetch('/readfile');
+            const result3 = await responseFile.text();
+            outputElement.innerText += `Read File Result: ${result3}`;
+
+            // Adjust placeholder styling
+            if (outputElement.innerText.trim()) {
+                outputElement.classList.remove('placeholder');
+            } else {
+                outputElement.classList.add('placeholder');
+                outputElement.textContent = 'Output will be here!';
+            }
+        }
+    </script>
+</body>
+</html>
