@@ -31,7 +31,6 @@
 </head>
 <body>
     <h1>Promisify Examples</h1>
-    <button onclick="Run()">Run</button>
     <div>
         <h2>1. Timeout</h2>
         <p>Here Timeout function promise to await until setTimeout is resolved, which allows us to use <b>delay in asynchronous code.</b></p>
@@ -39,7 +38,7 @@
         <input type="number" id="seconds" placeholder="Enter seconds">
     </div>
     <div>
-        <h2>Fetch Data</h2>
+        <h2>2.Fetch Data</h2>
         <label for="fetchUrl">Select URL to fetch:</label>
         <select id="fetchUrl" onchange="toggleCustomUrlInput()">
             <option value="https://jsonplaceholder.typicode.com/todos/1">https://jsonplaceholder.typicode.com/todos/1</option>
@@ -51,6 +50,7 @@
     <div>
         <h2>3. Read File</h2>
     </div>
+    <button onclick="Run()">Run</button>
     <h2>Output:</h2>
     <div class="output-box">
         <pre id="output" class="placeholder">Output will be here!</pre>
